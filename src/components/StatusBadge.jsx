@@ -1,0 +1,1 @@
+// Aca utilizaremos props, vamos a definir errores, y vamos a hacer un badge de estado para mostrar si la mascota esta activa o inactiva.

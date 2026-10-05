@@ -1,0 +1,1 @@
+// Aca deberíamos hacer un hook para almacenar en localStorage y poder usarlo en cualquier componente.

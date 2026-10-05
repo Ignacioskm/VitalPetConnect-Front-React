@@ -1,0 +1,1 @@
+// Ruta protegida, si el usuario no está logueado lo redirige al login.

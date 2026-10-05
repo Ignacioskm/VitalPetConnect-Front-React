@@ -1,0 +1,1 @@
+// Contexto para el login registro y logout de usuarios, para poder usarlo en cualquier componente.
