@@ -1,0 +1,126 @@
+/* estilos del panel, los mismos colores de la eval 1 (azul #0A58CA y fondo #F8F9F4)
+   van despues de bootstrap, no lo reemplazan */
+
+:root {
+  --vp-azul: #0A58CA;
+  --vp-azul-claro: #E7F1FF;
+  --vp-fondo: #F8F9F4;
+  --vp-borde: #E9ECEF;
+  --vp-gris: #6C757D;
+}
+
+body {
+  background-color: var(--vp-fondo);
+}
+
+/* menu lateral */
+.vp-sidebar {
+  background-color: #fff;
+  width: 240px;
+  min-height: 100vh;
+  padding: 20px 12px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-right: 1px solid var(--vp-borde);
+}
+
+.vp-logo {
+  color: var(--vp-azul);
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* los links del menu son botones, les saco el borde y el fondo */
+.vp-link {
+  color: var(--vp-gris);
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 6px;
+}
+
+/* el link de la pagina donde estoy */
+.vp-link.activo {
+  background-color: var(--vp-azul-claro);
+  color: var(--vp-azul);
+  font-weight: bold;
+}
+
+.vp-contenido {
+  margin-left: 240px;
+  padding: 25px 30px;
+}
+
+.vp-titulo {
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* tarjetas y cajas blancas */
+.vp-tarjeta, .vp-caja {
+  background-color: #fff;
+  border: 1px solid var(--vp-borde);
+  border-radius: 10px;
+  padding: 18px;
+}
+
+.vp-numero {
+  font-size: 30px;
+  font-weight: bold;
+  color: var(--vp-azul);
+  margin: 0;
+}
+
+.vp-etiqueta {
+  font-size: 13px;
+  color: var(--vp-gris);
+  text-transform: uppercase;
+}
+
+/* circulo del icono */
+.vp-icono {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  background-color: var(--vp-azul);
+}
+
+.vp-icono.amarillo { background-color: #FFC107; }
+.vp-icono.rojo     { background-color: #DC3545; }
+.vp-icono.azul     { background-color: #6EA8FE; }
+
+/* mensaje de error debajo de cada campo del formulario */
+.vp-error {
+  display: block;
+  color: #DC3545;
+  font-size: 13px;
+}
+
+.vp-tabla thead th {
+  background-color: var(--vp-azul-claro);
+  font-size: 13px;
+}
+
+/* en celular el menu se va arriba */
+@media (max-width: 768px) {
+  .vp-sidebar {
+    position: static;
+    width: 100%;
+    min-height: auto;
+  }
+
+  .vp-contenido {
+    margin-left: 0;
+    padding: 18px;
+  }
+}
