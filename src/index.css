@@ -1,1 +1,180 @@
-body { background:#F8F9F4 }
+/* ============ Base ============ */
+:root {
+  --bs-primary: #0A58CA;
+  --bs-primary-rgb: 10, 88, 202;
+
+  --vp-azul: #0A58CA;
+  --vp-azul-oscuro: #084298;
+  --vp-azul-claro: #E7F1FF;
+  --vp-fondo: #F8F9F4;
+  --vp-borde: #E9ECEF;
+  --vp-texto: #212529;
+  --vp-gris: #6C757D;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--vp-fondo);
+  color: var(--vp-texto);
+  margin: 0;
+}
+
+
+.btn-primary {
+  --bs-btn-bg: #0A58CA;
+  --bs-btn-border-color: #0A58CA;
+  --bs-btn-hover-bg: #084298;
+  --bs-btn-hover-border-color: #084298;
+  --bs-btn-active-bg: #084298;
+  --bs-btn-active-border-color: #084298;
+  --bs-btn-disabled-bg: #0A58CA;
+  --bs-btn-disabled-border-color: #0A58CA;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #0A58CA;
+  --bs-btn-border-color: #0A58CA;
+  --bs-btn-hover-bg: #0A58CA;
+  --bs-btn-hover-border-color: #0A58CA;
+  --bs-btn-active-bg: #0A58CA;
+  --bs-btn-active-border-color: #0A58CA;
+}
+
+
+.hero-section {
+  background-image: url('./assets/images/Imagen_Principal_Web_clinica_macul.png');
+  background-size: cover;
+  background-position: center right;
+  min-height: 80vh;
+}
+
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 45%, rgba(255,255,255,0) 100%);
+  z-index: 0;
+}
+
+@media (max-width: 768px) {
+  .hero-section::before {
+    background: linear-gradient(90deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 100%);
+  }
+}
+
+.custom-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.custom-card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+}
+
+.custom-hover:hover,
+footer a:hover {
+  color: var(--vp-azul) !important;
+}
+
+
+.vp-sidebar {
+  background-color: #fff;
+  width: 240px;
+  min-height: 100vh;
+  padding: 20px 12px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-right: 1px solid var(--vp-borde);
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+
+.vp-sidebar .vp-logo {
+  color: var(--vp-azul);
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 25px;
+  text-decoration: none;
+}
+
+.vp-sidebar .vp-link {
+  color: var(--vp-gris);
+  display: block;
+  padding: 10px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  margin-bottom: 4px;
+  background: none;
+  border: 0;
+  width: 100%;
+  text-align: left;
+}
+.vp-sidebar .vp-link:hover {
+  background-color: var(--vp-fondo);
+  color: var(--vp-azul);
+}
+/* NavLink de react-router agrega la clase "active" solo */
+.vp-sidebar .vp-link.active {
+  background-color: var(--vp-azul-claro);
+  color: var(--vp-azul);
+  font-weight: bold;
+}
+
+.vp-contenido { margin-left: 240px; padding: 25px 30px; }
+.vp-titulo { color: var(--vp-texto); font-weight: bold; margin-bottom: 4px; }
+.vp-subtitulo { color: var(--vp-gris); font-size: 14px; margin-bottom: 22px; }
+
+.vp-tarjeta {
+  background-color: #fff;
+  border: 1px solid var(--vp-borde);
+  border-radius: 10px;
+  padding: 18px;
+  height: 100%;
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+.vp-tarjeta .vp-numero { font-size: 30px; font-weight: bold; color: var(--vp-azul); margin: 0; }
+.vp-tarjeta .vp-etiqueta { font-size: 13px; color: var(--vp-gris); text-transform: uppercase; margin: 0; }
+
+.vp-icono {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  background-color: var(--vp-azul);
+}
+.vp-icono.amarillo { background-color: #FFC107; }
+.vp-icono.rojo     { background-color: #DC3545; }
+.vp-icono.azul     { background-color: #6EA8FE; }
+
+.vp-caja {
+  background-color: #fff;
+  border: 1px solid var(--vp-borde);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 22px;
+  box-shadow: 0 .125rem .25rem rgba(0,0,0,.075);
+}
+.vp-caja h5 { color: var(--vp-texto); font-weight: bold; margin-bottom: 16px; }
+
+.vp-tabla thead th {
+  background-color: var(--vp-azul-claro);
+  color: var(--vp-azul-oscuro);
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.vp-tabla tbody tr:hover { background-color: var(--vp-fondo); }
+
+.vp-ayuda { color: var(--vp-gris); font-size: 12px; }
+
+@media (max-width: 768px) {
+  .vp-sidebar { position: static; width: 100%; min-height: auto; }
+  .vp-contenido { margin-left: 0; padding: 18px; }
+}
