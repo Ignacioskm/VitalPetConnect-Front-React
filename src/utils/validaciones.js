@@ -1,7 +1,7 @@
 //Validaciones funciones etc
 
 //Definimos los dominios que teniamos antes
-export const ALLOWED_DOMAINS = ["@admin.cl", "@gmail.com", "@duocuc.cl", "@profesor.duoc.cl"];
+export const ALLOWED_DOMAINS = ["@admin.cl", "@gmail.com", "@duocuc.cl", "@profesor.duoc.cl","@duoc.cl"];
 
 //Validamos si termina en un dominio permitido
 export const isValidEmail = (email) => {

@@ -14,12 +14,15 @@ export function useLocalStorage(key, initialValue) {
   });
 
   const setValue = (value) => {
-    try {
-        setStoredValue(value);
-        window.localStorage.setItem(key, JSON.stringify(value));
-    } catch (error) {
+    setStoredValue((prev) => {
+      const next = value instanceof Function ? value(prev) : value;
+      try {
+        window.localStorage.setItem(key, JSON.stringify(next));
+      } catch (error) {
         console.error(error);
-    }
+      }
+      return next;
+    });
   };
 
   return [storedValue, setValue];

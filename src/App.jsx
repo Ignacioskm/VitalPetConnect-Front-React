@@ -1,41 +1,49 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
-
-import Login from './pages/Login';
+import { DataProvider } from './context/DataContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import PublicLayout from './layouts/PublicLayout';
+import DashboardLayout from './layouts/DashboardLayout';
 
-function App() {
+import Home from './pages/Home';
+import Services from './pages/Services';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import MyAccount from './pages/MyAccount';
+import DashHome from './pages/dashboard/DashHome';
+import Pets from './pages/dashboard/Pets';
+import Appointments from './pages/dashboard/Appointments';
+
+export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          {/* Rutas Públicas */}
-          <Route path="/" element={<Login />} /> {/* Asumiendo Home o Login de inicio */}
-          <Route path="/login" element={<Login />} />
-          
-          {/* Rutas Protegidas Cliente */}
-          <Route 
-            path="/mis-mascotas" 
-            element={
-              <ProtectedRoute allowedRole="cliente">
-                <div className="container mt-5"><h1>Panel de Cliente: Mis Mascotas</h1></div>
-              </ProtectedRoute>
-            } 
-          />
+        <DataProvider>
+          <Routes>
+            {/* Públicas (con navbar y footer) */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/servicios" element={<Services />} />
+            </Route>
 
-          {/* Rutas Protegidas Admin */}
-          <Route 
-            path="/dashboard" 
-            element={
-              <ProtectedRoute allowedRole="admin">
-                <div className="container mt-5"><h1>Panel de Administración</h1></div>
-              </ProtectedRoute>
-            } 
-          />
-        </Routes>
+            {/* Login y registro sin navbar */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/registro" element={<Register />} />
+
+            {/* Cliente */}
+            <Route element={<ProtectedRoute allowedRole="cliente"><PublicLayout /></ProtectedRoute>}>
+              <Route path="/mis-mascotas" element={<MyAccount />} />
+            </Route>
+
+            {/* Admin */}
+            <Route element={<ProtectedRoute allowedRole="admin"><DashboardLayout /></ProtectedRoute>}>
+              <Route path="/dashboard" element={<DashHome />} />
+              <Route path="/dashboard/mascotas" element={<Pets />} />
+              <Route path="/dashboard/citas" element={<Appointments />} />
+            </Route>
+          </Routes>
+        </DataProvider>
       </AuthProvider>
     </BrowserRouter>
   );
 }
-
-export default App;
