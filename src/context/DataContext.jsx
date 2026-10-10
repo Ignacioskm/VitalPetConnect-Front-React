@@ -7,7 +7,7 @@ export const DataContext = createContext();
 
 const nextId = (list, base = 0) => list.reduce((max,item) => Math.max(max,item.id), base) + 1
 
-export const DataProvieder = ({children}) => {
+export const DataProvider = ({children}) => {
 
     const [pets, setPets] = useLocalStorage('vp_pets', seedPets);
     const [appointments, setAppointments] = useLocalStorage('vp_appointments', seedAppointments);
