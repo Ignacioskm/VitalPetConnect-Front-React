@@ -12,6 +12,9 @@ export const AuthProvider = ({children}) => {
     //Utilizamos el hook personalizado para ver si ya existe la sesión si no null nomás
     const [user, setUser] = useLocalStorage('vp_userSession', null)
 
+    //Esto es para poder crear nuevos usuarios
+    const [userList, setUserList] = userLocalStorage('vp_usersList', seedUsers)
+
     const login = (email,password) => {
 
         //Se busca si el usuario existe en la mockdata
@@ -32,6 +35,24 @@ export const AuthProvider = ({children}) => {
         }
 
         return { success: false, message: "Correo o contraseña incorrectos."}
+    };
+
+    const register = (newUser) => {
+
+        //Verificamos por correo si ya existe
+        const exists = userList.find((u) => u.email === newUser.email);
+        if(exists){
+            return {success: false, message: "Este correo ya está registrado."};
+        }
+
+        const userAdd = {
+            ...newUser,
+            id: Date.now(), //Acá es como para simular una id nomás con la fecha actual hay que cambiarlo.
+            role: 'cliente'
+        };
+
+        setUserList([...userList, userAdd]);
+        return { success: true};
     };
 
     const logout = () => {
