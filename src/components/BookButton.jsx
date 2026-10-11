@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { services } from '../data/mockData';
+import { services, species} from '../data/mockData';
 import FormField from './FormField';
 
 
@@ -24,21 +24,27 @@ const todayISO = () => {
 };
 
 const EMPTY_FORM = { petName: '', reason: '', date: '', time: '' };
+const EMPTY_PET = {name : '', species: '', age: ''}
 
 export default function BookButton({ children = 'Agendar cita', className = 'btn btn-primary', service = '' }) {
   const { user } = useContext(AuthContext);
-  const { pets, addAppointment } = useContext(DataContext);
+  const { pets, addAppointment, addPet } = useContext(DataContext);
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [done, setDone] = useState(false);
 
+  //Esto se agregó desps de la guía para poderr registrar nuevva mascota en el bookbutton
+  const [newPet, setNewPet] = useState(EMPTY_PET);
+  const [petError, setPetError] = useState('');
+
   // Solo las mascotas activas del usuario logueado
   const myPets = user ? pets.filter((p) => p.ownerEmail === user.email && p.active) : [];
 
   const openModal = () => {
     setForm({ ...EMPTY_FORM, reason: service });
+    setNewPet(EMPTY_PET);
     setErrors({});
     setDone(false);
     setOpen(true);
@@ -58,6 +64,25 @@ export default function BookButton({ children = 'Agendar cita', className = 'btn
   }, [open]);
 
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+
+  const handlePetChange = (e) => setNewPet((prev) => ({ ...prev, [e.target.id]: e.target.value }));
+
+  const handleSavePet = (e) => {
+    e.preventDefault();
+    if (!newPet.name || !newPet.species || !newPet.age) {
+      setPetError('Por favor, completa todos los campos de la mascota.');
+      return;
+    }
+    
+    addPet({
+      name: newPet.name,
+      species: newPet.species,
+      age: parseInt(newPet.age),
+      ownerName: user.name,
+      ownerEmail: user.email,
+    });
+    
+  };
 
   const validate = () => {
     const err = {};
@@ -114,9 +139,32 @@ export default function BookButton({ children = 'Agendar cita', className = 'btn
 
     if (myPets.length === 0) {
       return (
-        <p className="text-secondary text-center py-3">
-          No tienes mascotas registradas. Contacta a la clínica para registrar a tu mascota.
-        </p>
+        <form onSubmit={handleSavePet} noValidate>
+          <div className="text-center mb-3">
+            <h6 className="fw-bold text-primary">¡Registra a tu compañero!</h6>
+            <p className="text-secondary small">No tienes mascotas registradas. Agrega una rápidamente para poder agendar tu cita.</p>
+          </div>
+          
+          {petError && <div className="alert alert-danger py-1 small">{petError}</div>}
+
+          <FormField id="name" label="Nombre" value={newPet.name} onChange={handlePetChange} placeholder="Ej: Firulais" required />
+          
+          <div className="row">
+            <div className="col-7">
+              <FormField id="species" label="Especie" as="select" value={newPet.species} onChange={handlePetChange} options={species} required />
+            </div>
+            <div className="col-5">
+              <FormField id="age" label="Edad" type="number" value={newPet.age} onChange={handlePetChange} placeholder="Ej: 3" required />
+            </div>
+          </div>
+          
+          <div className="d-grid gap-2 mt-2">
+            <button type="submit" className="btn btn-success fw-bold py-2">
+              Guardar y Continuar
+            </button>
+            <button type="button" className="btn btn-light fw-medium py-2" onClick={closeModal}>Cancelar</button>
+          </div>
+        </form>
       );
     }
 
