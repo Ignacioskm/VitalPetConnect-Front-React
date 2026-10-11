@@ -13,12 +13,12 @@ export const AuthProvider = ({children}) => {
     const [user, setUser] = useLocalStorage('vp_userSession', null)
 
     //Esto es para poder crear nuevos usuarios
-    const [userList, setUserList] = userLocalStorage('vp_usersList', seedUsers)
+    const [userList, setUserList] = useLocalStorage('vp_usersList', seedUsers)
 
     const login = (email,password) => {
 
         //Se busca si el usuario existe en la mockdata
-        const userFound = seedUsers.find(
+        const userFound = userList.find(
             (u) => u.email === email && u.password === password
         );
 
@@ -60,7 +60,7 @@ export const AuthProvider = ({children}) => {
     };
 
     return (
-        <AuthContext.Provider value ={{ user,login,logout}}>
+        <AuthContext.Provider value ={{ user, login, logout, register}}>
             {children}
         </AuthContext.Provider>
     );

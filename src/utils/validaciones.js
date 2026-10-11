@@ -9,7 +9,10 @@ export const isValidEmail = (email) => {
 }
 
 //Validamos el telefono con el regex
-export const isValidPhone = (phone) => phone.replace(/\D/g, "").length === 11;
+export const isValidPhone = (phone) => {
+  const soloNumeros = phone.replace(/\D/g, "");
+  return soloNumeros.length === 9 && soloNumeros.startsWith("9");
+}
 
 //Validamos que la pw sean iguales
 export const passwordsMatch = (password, confirmPassword) => password === confirmPassword;

@@ -1,5 +1,5 @@
 import { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { isValidEmail } from '../utils/validaciones';
 
@@ -73,6 +73,13 @@ export default function Login() {
             <button type="submit" className="btn btn-primary w-100 fw-bold">
               Ingresar
             </button>
+
+            <div className ="text-center">
+              <span className = "small text-muted"> ¿No tienes cuenta? </span>
+              <Link to= "/registro" className = "small text-decoration-none fw-bold">
+                Regístrate aquí
+              </Link>
+            </div>
           </form>
         </div>
       </div>

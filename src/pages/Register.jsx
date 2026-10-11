@@ -37,7 +37,7 @@ export default function Register() {
       return;
     }
     if (!isValidPhone(formData.phone)) {
-      setError('El teléfono debe tener 11 dígitos numéricos.');
+      setError('El teléfono debe tener exactamente 9 dígitos y comenzar con 9 (Ej: 912345678).');
       return;
     }
     if (!passwordsMatch(formData.password, formData.confirmPassword)) {
@@ -55,9 +55,10 @@ export default function Register() {
     });
 
     if (result.success) {
-      setSuccessMsg('¡Registro exitoso! Redirigiendo al login...');
-      // Aca hacemos como un suspend fun de kotlin para mandar al login desps de 2 segundos
-      setTimeout(() => navigate('/login'), 2000);
+      setSuccessMsg('¡Cuenta creada con éxito! Redirigiendo al inicio de sesión...')
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } else {
       setError(result.message);
     }
@@ -95,7 +96,7 @@ export default function Register() {
 
             <div className="mb-3">
               <label className="form-label small fw-semibold text-secondary">Teléfono</label>
-              <input type="tel" id="phone" className="form-control" placeholder="+56 9 1234 5678" value={formData.phone} onChange={handleChange} required />
+              <input type="tel" id="phone" className="form-control" placeholder="949934243" value={formData.phone} onChange={handleChange} required />
             </div>
 
             <div className="mb-3">
