@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
+import MyProfileEdit from './MyProfileEdit';
 import BookButton from './BookButton';
 
 const linkClass = ({ isActive }) =>
@@ -64,6 +65,9 @@ export default function Navbar() {
                   <i className="bi bi-person-fill me-1"></i>
                   {user.name}
                 </Link>
+
+                <MyProfileEdit />
+                
                 <button type="button" className="btn btn-outline-secondary" onClick={handleLogout} title="Cerrar sesión">
                   <i className="bi bi-box-arrow-right"></i>
                 </button>

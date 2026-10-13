@@ -28,7 +28,8 @@ export const AuthProvider = ({children}) => {
                 id: userFound.id,
                 name: userFound.name,
                 email: userFound.email,
-                role: userFound.role
+                role: userFound.role,
+                phone: userFound.phone
             };
             setUser(sessionData);
             return { success: true, role: userFound.role};
@@ -48,19 +49,37 @@ export const AuthProvider = ({children}) => {
         const userAdd = {
             ...newUser,
             id: Date.now(), //Acá es como para simular una id nomás con la fecha actual hay que cambiarlo.
-            role: 'cliente'
+            role: 'cliente',
+            phone: newUser.phone || '' //guarda el telefono si se ingreso, sino queda vacio
         };
 
         setUserList([...userList, userAdd]);
         return { success: true};
     };
 
-    const logout = () => {
-        setUser(null);
-    };
+        const updateProfile = (newName, newPhone) => {
+            if (!user) return;
+
+            // preparamos la informacion exacta 
+            const nuevaSesion = { ...user, name: newName, phone: newPhone };
+            const nuevaLista = userList.map((u) => 
+                u.email === user.email ? { ...u, name: newName, phone: newPhone } : u
+            );
+
+            // actualizamos la interfaz para que el Navbar cambie al instante
+            setUser(nuevaSesion);
+            setUserList(nuevaLista);
+
+            // aseguramos el guardado nativo en el navegador al mismo tiempo
+            localStorage.setItem('vp_userSession', JSON.stringify(nuevaSesion));
+            localStorage.setItem('vp_usersList', JSON.stringify(nuevaLista));
+        };
+            const logout = () => {
+                setUser(null);
+            };
 
     return (
-        <AuthContext.Provider value ={{ user, login, logout, register}}>
+        <AuthContext.Provider value ={{ user, login, logout, register, updateProfile }}>
             {children}
         </AuthContext.Provider>
     );
