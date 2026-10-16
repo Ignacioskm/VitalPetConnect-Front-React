@@ -28,19 +28,19 @@ export const seedAppointments = [
 ];
 
 export const services = [
-    {id: 1, title: "Consulta General", price: 15000, image: "src/assets/images/servicio-consulta-general.jpg",
+    {id: 1, title: "Consulta General", price: 15000, image: "public/images/servicio-consulta-general.jpg",
         description: "Evaluación física completa para asegurar el bienestar óptimo de tu paciente. Incluye revisión de signos vitales, peso y asesoramiento preventivo. Ideal para detectar problemas de salud tempranos y mantener a tu mascota en su mejor estado."},
-    {id: 2, title: "Vacunación", price: 12000, image: "src/assets/images/servicio-vacunacion.png", 
+    {id: 2, title: "Vacunación", price: 12000, image: "public/images/servicio-vacunacion.png", 
         description: "Esquema de inmunización estructurado (anual o para cachorros) diseñado para proteger a tu compañero contra las enfermedades virales y bacterianas más comunes. Incluye vacunas esenciales como la antirrábica, parvovirus, moquillo y leptospirosis, garantizando la salud y longevidad de tu mascota."},
-    {id: 3, title: "Urgencia", price: 35000, image: "src/assets/images/servicio-urgencia.jpg", 
+    {id: 3, title: "Urgencia", price: 35000, image: "public/images/servicio-urgencia.jpg", 
         description: "Atención médica inmediata y prioritaria para situaciones críticas. Contamos con el equipo necesario para estabilización rápida y manejo de dolor en momentos vitales. Nuestro objetivo es brindar soporte urgente y salvar vidas, asegurando que tu mascota reciba la atención que necesita sin demora."},
-    {id: 4, title: "Cirugía Menor", price: 80000, image: "src/assets/images/servicio-cirugia-menor.jpg", 
+    {id: 4, title: "Cirugía Menor", price: 80000, image: "public/images/servicio-cirugia-menor.jpg", 
         description: "Procedimientos quirúrgicos ambulatorios de baja complejidad (como suturas o extirpación de bultos pequeños), realizados con anestesia segura y monitoreo constante. Nuestro equipo garantiza una recuperación rápida y sin complicaciones, priorizando la comodidad y bienestar de tu mascota durante todo el proceso."},
-    {id: 5, title: "Ecografía", price: 30000, image: "src/assets/images/servicio-ecografia.webp", 
+    {id: 5, title: "Ecografía", price: 30000, image: "public/images/servicio-ecografia.webp", 
         description: "Diagnóstico por imagen rápido, seguro y no invasivo. Permite evaluar órganos internos en tiempo real, siendo ideal para seguimiento de gestación o detección de anomalías. Nuestro equipo de especialistas interpreta los resultados para ofrecer un plan de tratamiento adecuado y personalizado."},
-    {id: 6, title: "Examen de Sangre", price: 25000, image: "src/assets/images/servicio-examen-sangre.webp", 
+    {id: 6, title: "Examen de Sangre", price: 25000, image: "public/images/servicio-examen-sangre.webp", 
         description: "Análisis de laboratorio clínico preciso para evaluar el estado general de salud,revisar el funcionamiento de los órganos y detectar patologías de forma temprana. Incluye hemograma completo, perfil bioquímico y pruebas específicas según la necesidad de tu mascota, asegurando un diagnóstico confiable y oportuno."},
-    {id: 7, title: "Peluquería Canina", price: 20000, image: "src/assets/images/servicio-peluqueria.jpg", 
+    {id: 7, title: "Peluquería Canina", price: 20000, image: "public/images/servicio-peluqueria.jpg", 
         description: "Servicio Integral de estética e higiene. Incluye baño con productos especializados, corte de pelo según la raza, limpieza de oídos y recorte de uñas para su máxima comodidad. Nuestro objetivo es mantener a tu mascota limpia, saludable y con un aspecto impecable, garantizando su bienestar y felicidad."}
 ];
 
