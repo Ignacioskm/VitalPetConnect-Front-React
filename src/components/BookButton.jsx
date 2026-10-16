@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { DataContext } from '../context/DataContext';
-import { services, species} from '../data/mockData';
+import { services, species, vets} from '../data/mockData';
 import FormField from './FormField';
 
 
@@ -23,7 +23,7 @@ const todayISO = () => {
   return `${d.getFullYear()}-${month}-${day}`;
 };
 
-const EMPTY_FORM = { petName: '', reason: '', date: '', time: '' };
+const EMPTY_FORM = { petName: '', reason: '', date: '', time: '', vet: '' };
 const EMPTY_PET = {name : '', species: '', age: ''}
 
 export default function BookButton({ children = 'Agendar cita', className = 'btn btn-primary', service = '' }) {
@@ -88,6 +88,7 @@ export default function BookButton({ children = 'Agendar cita', className = 'btn
     const err = {};
     if (!form.petName) err.petName = 'Selecciona una mascota.';
     if (!form.reason) err.reason = 'Selecciona el motivo de la consulta.';
+    if (!form.vet) err.vet = 'Selecciona un veterinario.';
     if (!form.date) err.date = 'La fecha es obligatoria.';
     else if (form.date < todayISO()) err.date = 'No puedes agendar en una fecha pasada.';
     if (!form.time) err.time = 'Selecciona una hora.';
@@ -107,7 +108,7 @@ export default function BookButton({ children = 'Agendar cita', className = 'btn
       date: form.date,
       time: form.time,
       reason: form.reason,
-      vet: 'Por asignar',
+      vet: form.vet,
     });
     setDone(true);
   };
@@ -193,6 +194,17 @@ export default function BookButton({ children = 'Agendar cita', className = 'btn
             label: `${s.title} - $${s.price.toLocaleString('es-CL')}`,
           }))}
           placeholder="Selecciona un motivo..."
+          required
+        />
+        <FormField
+          id="vet"
+          label="Veterinario"
+          as="select"
+          value={form.vet}
+          onChange={handleChange}
+          error={errors.vet}
+          options={vets}
+          placeholder="Selecciona un especialista..."
           required
         />
         <div className="row">
