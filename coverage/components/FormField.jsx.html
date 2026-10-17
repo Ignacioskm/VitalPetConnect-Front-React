@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/27</span>
+                <span class='fraction'>27/27</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/11</span>
+                <span class='fraction'>11/11</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -145,8 +145,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">107x</span>
+<span class="cline-any cline-yes">107x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -157,14 +157,14 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">107x</span>
+<span class="cline-any cline-yes">26x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">193x</span>
+<span class="cline-any cline-yes">193x</span>
+<span class="cline-any cline-yes">193x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -172,13 +172,13 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">81x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">80x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">107x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -196,22 +196,22 @@
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// Input + label + errores reutilizables.
 // Label + control + mensaje de error. Soporta input, select y textarea.
 // options: ["Perro", "Gato"] o [{ value: "1", label: "Rocky" }]
-export default function <span class="fstat-no" title="function not covered" >FormField({</span>
+export default function FormField({
   id,
   label,
-  as = <span class="branch-0 cbranch-no" title="branch not covered" >'input',</span>
-  type = <span class="branch-0 cbranch-no" title="branch not covered" >'text',</span>
+  as = 'input',
+  type = 'text',
   value,
   onChange,
   error,
   help,
-  required = <span class="branch-0 cbranch-no" title="branch not covered" >false,</span>
-  options = <span class="branch-0 cbranch-no" title="branch not covered" >[],</span>
+  required = false,
+  options = [],
   placeholder,
   ...rest
 }) {
-  const className = <span class="cstat-no" title="statement not covered" >`${as === 'select' ? 'form-select' : 'form-control'}${error ? ' is-invalid' : ''}`;</span>
-  const common = <span class="cstat-no" title="statement not covered" >{</span>
+  const className = `${as === 'select' ? 'form-select' : 'form-control'}${error ? ' is-invalid' : ''}`;
+  const common = {
     id,
     value,
     onChange,
@@ -222,14 +222,14 @@ export default function <span class="fstat-no" title="function not covered" >For
   };
 &nbsp;
   let control;
-<span class="cstat-no" title="statement not covered" >  if (as === 'select') {</span>
-<span class="cstat-no" title="statement not covered" >    control = (</span>
+  if (as === 'select') {
+    control = (
       &lt;select {...common}&gt;
         &lt;option value=""&gt;{placeholder ?? 'Selecciona una opción'}&lt;/option&gt;
-        {options.<span class="fstat-no" title="function not covered" >map((o</span>) =&gt; {
-          const val = <span class="cstat-no" title="statement not covered" >typeof o === 'string' ? o : o.value;</span>
-          const text = <span class="cstat-no" title="statement not covered" >typeof o === 'string' ? o : o.label;</span>
-<span class="cstat-no" title="statement not covered" >          return (</span>
+        {options.map((o) =&gt; {
+          const val = typeof o === 'string' ? o : o.value;
+          const text = typeof o === 'string' ? o : o.label;
+          return (
             &lt;option key={val} value={val}&gt;
               {text}
             &lt;/option&gt;
@@ -237,13 +237,13 @@ export default function <span class="fstat-no" title="function not covered" >For
         })}
       &lt;/select&gt;
     );
-  } else <span class="cstat-no" title="statement not covered" >if (as === 'textarea') {</span>
-<span class="cstat-no" title="statement not covered" >    control = &lt;textarea rows={3} placeholder={placeholder} {...common} /&gt;;</span>
+  } else if (as === 'textarea') {
+    control = &lt;textarea rows={3} placeholder={placeholder} {...common} /&gt;;
   } else {
-<span class="cstat-no" title="statement not covered" >    control = &lt;input type={type} placeholder={placeholder} {...common} /&gt;;</span>
+    control = &lt;input type={type} placeholder={placeholder} {...common} /&gt;;
   }
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return (</span>
+  return (
     &lt;div className="mb-3"&gt;
       &lt;label htmlFor={id} className="form-label small fw-semibold text-secondary"&gt;
         {label}
@@ -265,7 +265,7 @@ export default function <span class="fstat-no" title="function not covered" >For
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-10-16T21:06:02.104Z
+                at 2026-10-17T16:59:45.180Z
             </div>
         <script src="../prettify.js"></script>
         <script>
