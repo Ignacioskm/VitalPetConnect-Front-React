@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">78.57% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>11/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">75% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>3/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/4</span>
+                <span class='fraction'>4/4</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">78.57% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/14</span>
+                <span class='fraction'>11/14</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line low'></div>
+    <div class='status-line medium'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -96,57 +96,57 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
+<span class="cline-any cline-yes">18x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">39x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">12x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">39x</span>
 <span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">// Aca deberíamos hacer un hook para almacenar en localStorage y poder usarlo en cualquier componente.
 &nbsp;
 import { useState } from 'react';
 &nbsp;
-export function <span class="fstat-no" title="function not covered" >useLocalStorage(k</span>ey, initialValue) {
-  const [storedValue, setStoredValue] = <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >useState(() =&gt; {</span></span>
-<span class="cstat-no" title="statement not covered" >    try {</span>
-      const item = <span class="cstat-no" title="statement not covered" >window.localStorage.getItem(key);</span>
-<span class="cstat-no" title="statement not covered" >      return item ? JSON.parse(item) : initialValue;</span>
+export function useLocalStorage(key, initialValue) {
+  const [storedValue, setStoredValue] = useState(() =&gt; {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? <span class="branch-0 cbranch-no" title="branch not covered" >JSON.parse(item) : i</span>nitialValue;
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      console.error(error);</span>
 <span class="cstat-no" title="statement not covered" >      return initialValue;</span>
     }
   });
 &nbsp;
-  const <span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >setValue = (v</span>alue) =&gt; {</span>
-<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >    setStoredValue((p</span>rev) =&gt; {</span>
-      const next = <span class="cstat-no" title="statement not covered" >value instanceof Function ? value(prev) : value;</span>
-<span class="cstat-no" title="statement not covered" >      try {</span>
-<span class="cstat-no" title="statement not covered" >        window.localStorage.setItem(key, JSON.stringify(next));</span>
+  const setValue = (value) =&gt; {
+    setStoredValue((prev) =&gt; {
+      const next = value instanceof Function ? value(prev) : value;
+      try {
+        window.localStorage.setItem(key, JSON.stringify(next));
       } catch (error) {
 <span class="cstat-no" title="statement not covered" >        console.error(error);</span>
       }
-<span class="cstat-no" title="statement not covered" >      return next;</span>
+      return next;
     });
   };
 &nbsp;
-<span class="cstat-no" title="statement not covered" >  return [storedValue, setValue];</span>
+  return [storedValue, setValue];
 }</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -154,7 +154,7 @@ export function <span class="fstat-no" title="function not covered" >useLocalSto
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-10-17T16:59:45.180Z
+                at 2026-10-18T20:58:11.444Z
             </div>
         <script src="../prettify.js"></script>
         <script>
