@@ -162,17 +162,3 @@ Los tests cubren los contextos (`AuthContext`, `DataContext`), el hook `useLocal
 - No se valida la disponibilidad de horarios ni choques entre citas.
 - Algunas páginas del panel admin usan `alert()` / `confirm()` nativos.
 
-## 🧭 Próximos pasos
-
-- [ ] Conectar con un backend / API REST y base de datos.
-- [ ] Autenticación real (hash de contraseñas, tokens/sesiones).
-- [ ] Validar disponibilidad de horarios y veterinarios.
-- [ ] Reemplazar `alert()` / `confirm()` por modales o toasts.
-- [ ] Reemplazar enlaces de redes sociales del footer por los reales.
-- [ ] Despliegue (Vercel, Netlify, etc.).
-
----
-
-## 👤 Autor
-
-Proyecto desarrollado por [Ignacioskm](https://github.com/Ignacioskm).
