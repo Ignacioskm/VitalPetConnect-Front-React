@@ -1,105 +1,230 @@
 import { useContext, useState } from "react";
 import { DataContext } from "../../context/DataContext";
-import { species } from "../../data/mockData";
-import { isValidEmail } from "../../utils/validaciones";
+import { seedUsers } from "../../data/mockData";
 import StatusBadge from "../../components/StatusBadge";
 
-// formulario vacio, se usa al partir y para limpiar despues de guardar
-const formVacio = { name: "", species: "", breed: "", age: "", ownerName: "", ownerEmail: "" };
+const emptyForm = {
+  name: "",
+  speciesId: "",
+  breed: "",
+  birthDate: "",
+  weight: "",
+  ownerId: "",
+};
 
-// pagina de mascotas: formulario para registrar y tabla con buscador
-// los datos y las funciones para agregar/eliminar salen del DataContext
 export default function Pets() {
-  const { pets, addPet, deletePet } = useContext(DataContext);
+  const {
+    pets,
+    species,
+    petsLoading,
+    petsError,
+    addPet,
+    deletePet,
+  } = useContext(DataContext);
 
-  const [busqueda, setBusqueda] = useState("");
-  const [form, setForm] = useState(formVacio);
-  const [errores, setErrores] = useState({});
+  const [form, setForm] = useState(emptyForm);
+  const [search, setSearch] = useState("");
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  // un solo manejador para todos los inputs, usa el name de cada input
-  function cambiarCampo(e) {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  }
+  const users = JSON.parse(
+    localStorage.getItem("vp_usersList") || "null"
+  ) ?? seedUsers;
 
-  function guardarMascota(e) {
-    e.preventDefault(); // para que no se recargue la pagina
+  const getOwner = (ownerId) => {
+    if (ownerId == null) return "Sin propietario";
 
-    const nuevosErrores = {};
-    let valido = true;
+    const owner = users.find(
+      (u) => Number(u.id) === Number(ownerId)
+    );
 
-    if (form.name.trim() === "") { nuevosErrores.name = "El nombre es obligatorio."; valido = false; }
-    if (form.species === "") { nuevosErrores.species = "Selecciona una especie."; valido = false; }
-    if (form.age === "" || Number(form.age) < 0 || Number(form.age) > 30) {
-      nuevosErrores.age = "Ingresa una edad entre 0 y 30."; valido = false;
+    return owner
+      ? `${owner.name} ${owner.lastName ?? ""}`.trim()
+      : `Usuario #${ownerId}`;
+  };
+
+  const getSpecies = (speciesId) => {
+    const item = species.find(
+      (s) => Number(s.id) === Number(speciesId)
+    );
+
+    const labels = {
+      DOG: "Perro",
+      CAT: "Gato",
+      BIRD: "Ave",
+      OTHER: "Otro",
+    };
+
+    return labels[item?.name?.toUpperCase()] ?? item?.name ?? "—";
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (
+      !form.name.trim() ||
+      !form.breed.trim() ||
+      !form.speciesId ||
+      !form.birthDate ||
+      form.weight === "" ||
+      Number(form.weight) <= 0
+    ) {
+      setError("Completa los campos obligatorios.");
+      return;
     }
-    if (form.ownerName.trim() === "") { nuevosErrores.ownerName = "El nombre del dueno es obligatorio."; valido = false; }
-    if (!isValidEmail(form.ownerEmail)) {
-      nuevosErrores.ownerEmail = "Correo no valido (usa @gmail.com, @duoc.cl, etc.)."; valido = false;
+
+    setSaving(true);
+
+    try {
+      await addPet({
+        name: form.name.trim(),
+        speciesId: Number(form.speciesId),
+        breed: form.breed.trim(),
+        birthDate: form.birthDate,
+        weight: Number(form.weight),
+        ownerId: form.ownerId
+          ? Number(form.ownerId)
+          : null,
+      });
+
+      setForm(emptyForm);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        "No se pudo registrar la mascota."
+      );
+    } finally {
+      setSaving(false);
     }
+  };
 
-    setErrores(nuevosErrores);
-    if (!valido) return;
+  const handleDelete = async (id) => {
+    if (!window.confirm("¿Desactivar esta mascota?")) return;
 
-    let raza = form.breed.trim();
-    if (raza === "") raza = "Sin especificar";
+    try {
+      await deletePet(id);
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        "No se pudo desactivar la mascota."
+      );
+    }
+  };
 
-    // le paso los datos del formulario, el context le pone el id y active
-    addPet({
-      name: form.name.trim(),
-      species: form.species,
-      breed: raza,
-      age: Number(form.age),
-      ownerName: form.ownerName.trim(),
-      ownerEmail: form.ownerEmail.trim(),
-    });
+  const filteredPets = pets.filter((pet) => {
+    const text = search.toLowerCase();
 
-    setForm(formVacio);
-    alert("Mascota registrada correctamente.");
-  }
-
-  function eliminarMascota(id) {
-    if (!confirm("Seguro que quieres eliminar esta mascota?")) return;
-    // el context borra la mascota con ese id
-    deletePet(id);
-  }
+    return (
+      pet.name.toLowerCase().includes(text) ||
+      getOwner(pet.ownerId).toLowerCase().includes(text)
+    );
+  });
 
   return (
     <div>
       <h2 className="vp-titulo">Mascotas</h2>
 
       <div className="row g-3">
-        {/* en pc el formulario a la izquierda y la tabla a la derecha */}
         <div className="col-12 col-xl-4">
-          <form className="vp-caja" onSubmit={guardarMascota}>
+          <form className="vp-caja" onSubmit={handleSubmit}>
             <h5>Registrar mascota</h5>
 
+            {error && (
+              <div className="alert alert-danger">{error}</div>
+            )}
+
             <label className="form-label">Nombre</label>
-            <input className="form-control" name="name" value={form.name} onChange={cambiarCampo} />
-            {errores.name && <small className="vp-error">{errores.name}</small>}
+            <input
+              className="form-control"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              required
+            />
 
             <label className="form-label mt-2">Especie</label>
-            <select className="form-select" name="species" value={form.species} onChange={cambiarCampo}>
-              <option value="">Selecciona</option>
-              {species.map((s) => <option key={s} value={s}>{s}</option>)}
+            <select
+              className="form-select"
+              name="speciesId"
+              value={form.speciesId}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Selecciona una especie</option>
+              {species.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {getSpecies(s.id)}
+                </option>
+              ))}
             </select>
-            {errores.species && <small className="vp-error">{errores.species}</small>}
 
-            <label className="form-label mt-2">Raza (opcional)</label>
-            <input className="form-control" name="breed" value={form.breed} onChange={cambiarCampo} />
+            <label className="form-label mt-2">Raza</label>
+            <input
+              className="form-control"
+              name="breed"
+              value={form.breed}
+              onChange={handleChange}
+              required
+            />
 
-            <label className="form-label mt-2">Edad</label>
-            <input className="form-control" type="number" name="age" value={form.age} onChange={cambiarCampo} />
-            {errores.age && <small className="vp-error">{errores.age}</small>}
+            <label className="form-label mt-2">
+              Fecha de nacimiento
+            </label>
+            <input
+              className="form-control"
+              type="date"
+              name="birthDate"
+              max={new Date().toLocaleDateString("en-CA")}
+              value={form.birthDate}
+              onChange={handleChange}
+              required
+            />
 
-            <label className="form-label mt-2">Dueno</label>
-            <input className="form-control" name="ownerName" value={form.ownerName} onChange={cambiarCampo} />
-            {errores.ownerName && <small className="vp-error">{errores.ownerName}</small>}
+            <label className="form-label mt-2">
+              Peso (kg)
+            </label>
+            <input
+              className="form-control"
+              type="number"
+              min="0.01"
+              step="0.01"
+              name="weight"
+              value={form.weight}
+              onChange={handleChange}
+              required
+            />
 
-            <label className="form-label mt-2">Correo del dueno</label>
-            <input className="form-control" name="ownerEmail" value={form.ownerEmail} onChange={cambiarCampo} />
-            {errores.ownerEmail && <small className="vp-error">{errores.ownerEmail}</small>}
+            <label className="form-label mt-2">
+              Propietario
+            </label>
+            <select
+              className="form-select"
+              name="ownerId"
+              value={form.ownerId}
+              onChange={handleChange}
+            >
+              <option value="">Sin propietario</option>
+              {users
+                .filter((u) => u.role === "cliente")
+                .map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.name} {u.lastName} (ID: {u.id})
+                  </option>
+                ))}
+            </select>
 
-            <button type="submit" className="btn btn-primary w-100 mt-3">Guardar</button>
+            <button
+              className="btn btn-primary w-100 mt-3"
+              disabled={saving}
+            >
+              {saving ? "Guardando..." : "Guardar mascota"}
+            </button>
           </form>
         </div>
 
@@ -107,47 +232,65 @@ export default function Pets() {
           <section className="vp-caja">
             <input
               className="form-control mb-3"
-              placeholder="Buscar por nombre o dueno..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
+              placeholder="Buscar por mascota o propietario..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
             />
+
+            {petsLoading && <p>Cargando mascotas...</p>}
+            {petsError && (
+              <div className="alert alert-danger">
+                {petsError}
+              </div>
+            )}
 
             <div className="table-responsive">
               <table className="table vp-tabla align-middle">
                 <thead>
                   <tr>
+                    <th>ID</th>
                     <th>Nombre</th>
                     <th>Especie</th>
                     <th>Raza</th>
-                    <th>Edad</th>
-                    <th>Dueno</th>
+                    <th>Nacimiento</th>
+                    <th>Peso</th>
+                    <th>Propietario</th>
                     <th>Estado</th>
-                    <th></th>
+                    <th>Acción</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {pets.map(function (m, i) {
-                    // si hay busqueda y no calza ni el nombre ni el dueno, no se muestra
-                    const texto = busqueda.toLowerCase();
-                    if (!m.name.toLowerCase().includes(texto) && !m.ownerName.toLowerCase().includes(texto)) {
-                      return null;
-                    }
-                    return (
-                      <tr key={i}>
-                        <td>{m.name}</td>
-                        <td>{m.species}</td>
-                        <td>{m.breed}</td>
-                        <td>{m.age}</td>
-                        <td>{m.ownerName}</td>
-                        <td><StatusBadge status={m.active ? "Activo" : "Inactivo"} /></td>
-                        <td>
-                          <button className="btn btn-sm btn-outline-danger" onClick={() => eliminarMascota(m.id)}>
-                            Eliminar
-                          </button>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {filteredPets.map((pet) => (
+                    <tr key={pet.id}>
+                      <td>{pet.id}</td>
+                      <td>{pet.name}</td>
+                      <td>{getSpecies(pet.speciesId)}</td>
+                      <td>{pet.breed}</td>
+                      <td>{pet.birthDate}</td>
+                      <td>{pet.weight} kg</td>
+                      <td>{getOwner(pet.ownerId)}</td>
+                      <td>
+                        <StatusBadge
+                          status={pet.active ? "Activo" : "Inactivo"}
+                        />
+                      </td>
+                      <td>
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleDelete(pet.id)}
+                        >
+                          Desactivar
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                  {!petsLoading && filteredPets.length === 0 && (
+                    <tr>
+                      <td colSpan="9" className="text-center">
+                        No hay mascotas registradas.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
