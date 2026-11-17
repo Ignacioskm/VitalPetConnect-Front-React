@@ -1,87 +1,78 @@
-// Contexto para el login registro y logout de usuarios, para poder usarlo en cualquier componente.
-
 import { createContext } from 'react';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import { seedUsers } from '../data/mockData';
-
+import { usersService } from '../api/usersService';
 
 export const AuthContext = createContext();
 
-export const AuthProvider = ({children}) => {
+// el rol que viene del backend cambia a su valor correspondiente (CLIENT = cliente, ADMIN = admin)
+const normalizeRole = (role) => {
+  if (!role) return 'cliente';
+  const upper = role.toUpperCase();
+  if (upper === 'CLIENT' || upper === 'CLIENTE') return 'cliente';
+  if (upper === 'ADMIN') return 'admin';
+  return role.toLowerCase();
+};
 
-    //Utilizamos el hook personalizado para ver si ya existe la sesión si no null nomás
-    const [user, setUser] = useLocalStorage('vp_userSession', null)
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useLocalStorage('vp_userSession', null);
 
-    //Esto es para poder crear nuevos usuarios
-    const [userList, setUserList] = useLocalStorage('vp_usersList', seedUsers)
+  const login = async (email, password) => {
+    try {
+      const userData = await usersService.login(email, password);
+      const normalizedRole = normalizeRole(userData.role);
 
-    const login = (email,password) => {
+      const sessionData = {
+        id: userData.id,
+        name: userData.name,
+        email: userData.email,
+        role: normalizedRole,
+        phone: userData.phone || '',
+      };
 
-        //Se busca si el usuario existe en la mockdata
-        const userFound = userList.find(
-            (u) => u.email === email && u.password === password
-        );
+      setUser(sessionData);
+      return { success: true, role: normalizedRole };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data || 'Correo o contraseña incorrectos.',
+      };
+    }
+  };
 
-        if (userFound) {
-            //Guardamos al usuarion SIN LA PW POR SEGURIDAD
-            const sessionData ={
-                id: userFound.id,
-                name: userFound.name,
-                email: userFound.email,
-                role: userFound.role,
-                phone: userFound.phone
-            };
-            setUser(sessionData);
-            return { success: true, role: userFound.role};
-        }
+  const register = async (newUser) => {
+    try {
+      // se une nombre y apellido porque en el backend solo tiene name
+      const fullName = `${newUser.name.trim()} ${newUser.lastName?.trim() || ''}`.trim();
 
-        return { success: false, message: "Correo o contraseña incorrectos."}
-    };
+      await usersService.register({
+        name: fullName,
+        email: newUser.email,
+        password: newUser.password,
+      });
 
-    const register = (newUser) => {
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data || 'Error al registrar usuario. El correo ya existe.',
+      };
+    }
+  };
 
-        //Verificamos por correo si ya existe
-        const exists = userList.find((u) => u.email === newUser.email);
-        if(exists){
-            return {success: false, message: "Este correo ya está registrado."};
-        }
+  const updateProfile = (newName, newPhone) => {
+    if (!user) return;
+    const nuevaSesion = { ...user, name: newName, phone: newPhone };
+    setUser(nuevaSesion);
+    localStorage.setItem('vp_userSession', JSON.stringify(nuevaSesion));
+  };
 
-        const userAdd = {
-            ...newUser,
-            id: Date.now(), //Acá es como para simular una id nomás con la fecha actual hay que cambiarlo.
-            role: 'cliente',
-            phone: newUser.phone || '' //guarda el telefono si se ingreso, sino queda vacio
-        };
+  const logout = () => {
+    setUser(null);
+  };
 
-        setUserList([...userList, userAdd]);
-        return { success: true};
-    };
-
-        const updateProfile = (newName, newPhone) => {
-            if (!user) return;
-
-            // preparamos la informacion exacta 
-            const nuevaSesion = { ...user, name: newName, phone: newPhone };
-            const nuevaLista = userList.map((u) => 
-                u.email === user.email ? { ...u, name: newName, phone: newPhone } : u
-            );
-
-            // actualizamos la interfaz para que el Navbar cambie al instante
-            setUser(nuevaSesion);
-            setUserList(nuevaLista);
-
-            // aseguramos el guardado nativo en el navegador al mismo tiempo
-            localStorage.setItem('vp_userSession', JSON.stringify(nuevaSesion));
-            localStorage.setItem('vp_usersList', JSON.stringify(nuevaLista));
-        };
-            const logout = () => {
-                setUser(null);
-            };
-
-    return (
-        <AuthContext.Provider value ={{ user, login, logout, register, updateProfile }}>
-            {children}
-        </AuthContext.Provider>
-    );
-
+  return (
+    <AuthContext.Provider value={{ user, login, logout, register, updateProfile }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
