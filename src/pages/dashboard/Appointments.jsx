@@ -1,9 +1,9 @@
 import { useContext, useState } from "react";
 import { DataContext } from "../../context/DataContext";
-import { vets } from "../../data/mockData";
+import { vets, seedUsers } from "../../data/mockData";
 import StatusBadge from "../../components/StatusBadge";
 
-const formVacio = { petName: "", date: "", time: "", reason: "", vet: "" };
+const formVacio = { petId: "", date: "", time: "", reason: "", vet: "" };
 
 // devuelve la fecha de hoy en formato aaaa-mm-dd (igual que en la eval 1)
 function obtenerFechaHoy() {
@@ -16,23 +16,37 @@ function obtenerFechaHoy() {
 // pagina de citas: formulario para agendar y tabla con filtro y botones
 // los datos y las funciones salen del DataContext
 export default function Appointments() {
-  const { appointments, addAppointment, updateAppointmentStatus, pets } = useContext(DataContext);
+  const { appointments, addAppointment, updateAppointmentStatus, pets, appointmentsError } = useContext(DataContext);
+
+  // los usuarios siguen en localstorage, igual que en Pets.jsx
+  const usuarios = JSON.parse(localStorage.getItem("vp_usersList") || "null") ?? seedUsers;
+
+  // busca el dueno por id para mostrar el nombre en el select
+  function buscarDueno(ownerId) {
+    return usuarios.find((u) => Number(u.id) === Number(ownerId));
+  }
+
+  function nombreDueno(ownerId) {
+    const u = buscarDueno(ownerId);
+    return u ? (u.name + " " + (u.lastName ?? "")).trim() : "Usuario #" + ownerId;
+  }
 
   const [filtro, setFiltro] = useState("Todas");
   const [form, setForm] = useState(formVacio);
   const [errores, setErrores] = useState({});
+  const [errorApi, setErrorApi] = useState("");
 
   function cambiarCampo(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function guardarCita(e) {
+  async function guardarCita(e) {
     e.preventDefault();
 
     const nuevosErrores = {};
     let valido = true;
 
-    if (form.petName === "") { nuevosErrores.petName = "Selecciona una mascota."; valido = false; }
+    if (form.petId === "") { nuevosErrores.petId = "Selecciona una mascota."; valido = false; }
     if (form.date === "") {
       nuevosErrores.date = "La fecha es obligatoria."; valido = false;
     } else if (form.date < obtenerFechaHoy()) {
@@ -49,28 +63,46 @@ export default function Appointments() {
     setErrores(nuevosErrores);
     if (!valido) return;
 
-    // busco el dueno de la mascota elegida
-    let dueno = "";
-    for (let i = 0; i < pets.length; i++) {
-      if (pets[i].name === form.petName) {
-        dueno = pets[i].ownerName;
-        break;
-      }
+    // busco la mascota elegida por id y de ahi saco el dueno
+    const mascota = pets.find((m) => Number(m.id) === Number(form.petId));
+    if (!mascota) {
+      setErrores({ petId: "La mascota seleccionada no esta disponible." });
+      return;
     }
+    const dueno = buscarDueno(mascota.ownerId);
 
-    // le paso los datos, el context le pone el id y el status "Pendiente"
-    addAppointment({
-      petName: form.petName,
-      ownerName: dueno,
-      date: form.date,
-      time: form.time,
-      reason: form.reason.trim(),
-      vet: form.vet,
-    });
+    setErrorApi("");
 
-    setForm(formVacio);
-    setFiltro("Todas");
-    alert("Cita agendada para " + form.petName + ".");
+    try {
+      // el back le pone el id y el status "Pendiente"
+      await addAppointment({
+        petId: mascota.id,
+        petName: mascota.name,
+        ownerId: Number(mascota.ownerId),
+        ownerName: nombreDueno(mascota.ownerId),
+        ownerEmail: dueno ? dueno.email : "",
+        date: form.date,
+        time: form.time,
+        reason: form.reason.trim(),
+        vet: form.vet,
+      });
+
+      setForm(formVacio);
+      setFiltro("Todas");
+      alert("Cita agendada para " + mascota.name + ".");
+    } catch (error) {
+      setErrorApi(error.response?.data?.message || "No se pudo agendar la cita.");
+    }
+  }
+
+  // cambia el estado y muestra el error del back si la transicion no es valida
+  async function cambiarEstado(id, estado) {
+    setErrorApi("");
+    try {
+      await updateAppointmentStatus(id, estado);
+    } catch (error) {
+      setErrorApi(error.response?.data?.message || "No se pudo cambiar el estado.");
+    }
   }
 
   return (
@@ -83,13 +115,13 @@ export default function Appointments() {
             <h5>Agendar cita</h5>
 
             <label className="form-label">Mascota</label>
-            <select className="form-select" name="petName" value={form.petName} onChange={cambiarCampo}>
+            <select className="form-select" name="petId" value={form.petId} onChange={cambiarCampo}>
               <option value="">Selecciona</option>
-              {pets.map((m, i) =>
-                m.active ? <option key={i} value={m.name}>{m.name} ({m.ownerName})</option> : null
+              {pets.map((m) =>
+                m.active ? <option key={m.id} value={m.id}>{m.name} ({nombreDueno(m.ownerId)})</option> : null
               )}
             </select>
-            {errores.petName && <small className="vp-error">{errores.petName}</small>}
+            {errores.petId && <small className="vp-error">{errores.petId}</small>}
 
             <label className="form-label mt-2">Fecha</label>
             <input className="form-control" type="date" name="date" value={form.date} onChange={cambiarCampo} />
@@ -110,12 +142,16 @@ export default function Appointments() {
             </select>
             {errores.vet && <small className="vp-error">{errores.vet}</small>}
 
+            {errorApi && <div className="alert alert-danger mt-3 mb-0">{errorApi}</div>}
+
             <button type="submit" className="btn btn-primary w-100 mt-3">Agendar</button>
           </form>
         </div>
 
         <div className="col-12 col-xl-8">
           <section className="vp-caja">
+            {appointmentsError && <div className="alert alert-danger">{appointmentsError}</div>}
+
             <select className="form-select w-auto mb-3" value={filtro} onChange={(e) => setFiltro(e.target.value)}>
               <option value="Todas">Todas</option>
               <option value="Pendiente">Pendientes</option>
@@ -146,18 +182,18 @@ export default function Appointments() {
                     if (c.status === "Pendiente") {
                       botones = (
                         <>
-                          <button className="btn btn-sm btn-success me-1" onClick={() => updateAppointmentStatus(c.id, "Confirmada")}>Confirmar</button>
-                          <button className="btn btn-sm btn-outline-danger" onClick={() => updateAppointmentStatus(c.id, "Cancelada")}>Cancelar</button>
+                          <button className="btn btn-sm btn-success me-1" onClick={() => cambiarEstado(c.id, "Confirmada")}>Confirmar</button>
+                          <button className="btn btn-sm btn-outline-danger" onClick={() => cambiarEstado(c.id, "Cancelada")}>Cancelar</button>
                         </>
                       );
                     } else if (c.status === "Confirmada") {
                       botones = (
-                        <button className="btn btn-sm btn-outline-secondary" onClick={() => updateAppointmentStatus(c.id, "Realizada")}>Marcar realizada</button>
+                        <button className="btn btn-sm btn-outline-secondary" onClick={() => cambiarEstado(c.id, "Realizada")}>Marcar realizada</button>
                       );
                     }
 
                     return (
-                      <tr key={i}>
+                      <tr key={c.id}>
                         <td>{c.petName}</td>
                         <td>{c.ownerName}</td>
                         <td>{c.date} {c.time}</td>
