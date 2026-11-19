@@ -4,34 +4,32 @@ import { AuthContext } from '../context/AuthContext';
 import { isValidEmail, isValidPhone, passwordsMatch } from '../utils/validaciones';
 
 export default function Register() {
-  
   const [formData, setFormData] = useState({
     name: '',
     lastName: '',
     email: '',
     phone: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
-  
+
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-  
+  const [loading, setLoading] = useState(false);
+
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // Función para actualizar los estados cuando el usuario escribe
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccessMsg('');
 
-    // Validamos las weaitas
     if (!isValidEmail(formData.email)) {
       setError('Dominio de correo no permitido.');
       return;
@@ -45,17 +43,18 @@ export default function Register() {
       return;
     }
 
-    // Hacemos el "Registro"
-    const result = register({
+    setLoading(true);
+    const result = await register({
       name: formData.name,
       lastName: formData.lastName,
       email: formData.email.trim().toLowerCase(),
       phone: formData.phone,
-      password: formData.password
+      password: formData.password,
     });
+    setLoading(false);
 
     if (result.success) {
-      setSuccessMsg('¡Cuenta creada con éxito! Redirigiendo al inicio de sesión...')
+      setSuccessMsg('¡Cuenta creada con éxito! Redirigiendo al inicio de sesión...');
       setTimeout(() => {
         navigate('/login');
       }, 2000);
@@ -63,7 +62,6 @@ export default function Register() {
       setError(result.message);
     }
   };
-
 
   return (
     <div className="container mt-5 mb-5">
@@ -109,10 +107,10 @@ export default function Register() {
               <input type="password" id="confirmPassword" className="form-control" value={formData.confirmPassword} onChange={handleChange} required />
             </div>
 
-            <button type="submit" className="btn btn-primary w-100 fw-bold mb-3">
-              Registrarse
+            <button type="submit" className="btn btn-primary w-100 fw-bold mb-3" disabled={loading}>
+              {loading ? 'Registrando...' : 'Registrarse'}
             </button>
-            
+
             <div className="text-center">
               <span className="small text-muted">¿Ya tienes cuenta? </span>
               <Link to="/login" className="small text-decoration-none fw-bold">Inicia sesión</Link>
