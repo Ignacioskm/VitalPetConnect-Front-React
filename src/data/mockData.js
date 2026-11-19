@@ -16,17 +16,6 @@ export const seedPets = [
   { id: 7, name: "Roxy", species: "Perro", breed: "Quiltro", age: 5, ownerName: "Felipe Muñoz", ownerEmail: "felipe.munoz@duoc.cl", active: true }
 ];
 
-export const seedAppointments = [
-    { id: 101, petName: "Rocky", ownerName: "Camila Rojas", ownerEmail: "camila.rojas@gmail.com",
-        date: "2026-10-20", time: "09:30", reason: "Vacuna antirrábica", vet: "Dra. Paula Núñez", status: "Pendiente" },
-    { id: 102, petName: "Luna", ownerName: "Camila Rojas", ownerEmail: "camila.rojas@gmail.com",
-        date: "2026-10-20", time: "09:30", reason: "Vacuna antirrábica", vet: "Dr. Luis Carrasco", status: "Confirmada" },
-    { id: 103, petName: "Nala", ownerName: "Camila Rojas", ownerEmail: "camila.rojas@gmail.com",
-        date: "2026-10-20", time: "09:30", reason: "Vacuna antirrábica", vet: "Dra. Antonia Bravo", status: "Cancelada" },
-    { id: 104, petName: "Mango", ownerName: "Felipe Muñoz", ownerEmail: "felipe.munoz@duoc.cl",
-        date: "2026-10-20", time: "09:30", reason: "Vacuna antirrábica", vet: "Dra. Paula Núñez", status: "Realizada" }
-];
-
 export const services = [
     {id: 1, title: "Consulta General", price: 15000, image: "/images/servicio-consulta-general.jpg",
         description: "Evaluación física completa para asegurar el bienestar óptimo de tu paciente. Incluye revisión de signos vitales, peso y asesoramiento preventivo. Ideal para detectar problemas de salud tempranos y mantener a tu mascota en su mejor estado."},

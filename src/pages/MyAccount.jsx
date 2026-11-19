@@ -28,6 +28,7 @@ export default function MyAccount() {
     petsError,
     addPet,
     appointments,
+    appointmentsError,
     updateAppointmentStatus,
   } = useContext(DataContext);
 
@@ -36,6 +37,7 @@ export default function MyAccount() {
   const [petError, setPetError] = useState("");
   const [petSuccess, setPetSuccess] = useState("");
   const [saving, setSaving] = useState(false);
+  const [appointmentError, setAppointmentError] = useState("");
 
   const myPets = pets.filter(
     (pet) =>
@@ -43,9 +45,24 @@ export default function MyAccount() {
       pet.active
   );
 
+  // las citas se filtran por ownerId, igual que las mascotas
   const myAppointments = appointments.filter(
-    (appointment) => appointment.ownerEmail === user?.email
+    (appointment) => Number(appointment.ownerId) === Number(user?.id)
   );
+
+  // cancela la cita y muestra el error del back si no se puede (409)
+  const cancelAppointment = async (id) => {
+    setAppointmentError("");
+
+    try {
+      await updateAppointmentStatus(id, "Cancelada");
+    } catch (error) {
+      setAppointmentError(
+        error.response?.data?.message ||
+        "No se pudo cancelar la cita."
+      );
+    }
+  };
 
   const getSpeciesName = (speciesId) => {
     const item = species.find(
@@ -293,6 +310,18 @@ export default function MyAccount() {
       <section className="vp-caja">
         <h5 className="mb-3">Mis Citas</h5>
 
+        {appointmentsError && (
+          <div className="alert alert-danger" role="alert">
+            {appointmentsError}
+          </div>
+        )}
+
+        {appointmentError && (
+          <div className="alert alert-danger" role="alert">
+            {appointmentError}
+          </div>
+        )}
+
         <div className="table-responsive">
           <table className="table vp-tabla align-middle">
             <thead>
@@ -331,10 +360,7 @@ export default function MyAccount() {
                         <button
                           className="btn btn-sm btn-outline-danger"
                           onClick={() =>
-                            updateAppointmentStatus(
-                              appointment.id,
-                              "Cancelada"
-                            )
+                            cancelAppointment(appointment.id)
                           }
                         >
                           Cancelar

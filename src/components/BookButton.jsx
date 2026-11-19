@@ -73,6 +73,8 @@ export default function BookButton({
   const [errors, setErrors] = useState({});
   const [done, setDone] = useState(false);
   const [confirmedPetName, setConfirmedPetName] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   // Estados del registro de mascotas
   const [newPet, setNewPet] = useState(EMPTY_PET);
@@ -108,6 +110,7 @@ export default function BookButton({
     setPetError('');
     setDone(false);
     setConfirmedPetName('');
+    setSubmitError('');
     setOpen(true);
   };
 
@@ -283,8 +286,8 @@ export default function BookButton({
     return err;
   };
 
-  // Agendar cita (todavía con localStorage)
-  const handleSubmit = (e) => {
+  // agendar cita, ahora llama al ms de citas
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const err = validate();
@@ -305,22 +308,34 @@ export default function BookButton({
       return;
     }
 
-    // Se conserva petName para las otras pantallas
-    // y se agrega petId para una futura integración
-    addAppointment({
-      petId: selectedPet.id,
-      petName: selectedPet.name,
-      ownerId: Number(user.id),
-      ownerName: user.name,
-      ownerEmail: user.email,
-      date: form.date,
-      time: form.time,
-      reason: form.reason,
-      vet: form.vet,
-    });
+    setSubmitError('');
+    setSubmitting(true);
 
-    setConfirmedPetName(selectedPet.name);
-    setDone(true);
+    try {
+      // POST /api/appointments
+      await addAppointment({
+        petId: selectedPet.id,
+        petName: selectedPet.name,
+        ownerId: Number(user.id),
+        ownerName: user.name,
+        ownerEmail: user.email,
+        date: form.date,
+        time: form.time,
+        reason: form.reason,
+        vet: form.vet,
+      });
+
+      setConfirmedPetName(selectedPet.name);
+      setDone(true);
+    } catch (error) {
+      // muestro el mensaje que manda el back (horario, fecha, mascota, etc)
+      setSubmitError(
+        error.response?.data?.message ||
+        'No se pudo agendar la cita. Intenta de nuevo.'
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // Contenido del modal
@@ -584,12 +599,19 @@ export default function BookButton({
           </div>
         </div>
 
+        {submitError && (
+          <div className="alert alert-danger" role="alert">
+            {submitError}
+          </div>
+        )}
+
         <div className="d-grid gap-2">
           <button
             type="submit"
             className="btn btn-primary fw-medium py-2"
+            disabled={submitting}
           >
-            Confirmar cita
+            {submitting ? 'Agendando...' : 'Confirmar cita'}
           </button>
 
           <button

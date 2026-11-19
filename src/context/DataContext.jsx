@@ -5,14 +5,10 @@ import {
   useState,
 } from "react";
 
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { seedAppointments } from "../data/mockData";
 import { petsService } from "../api/petsService";
+import { appointmentsService } from "../api/appointmentsService";
 
 export const DataContext = createContext();
-
-const nextId = (list, base = 0) =>
-  list.reduce((max, item) => Math.max(max, item.id), base) + 1;
 
 export const DataProvider = ({ children }) => {
   const [pets, setPets] = useState([]);
@@ -20,11 +16,10 @@ export const DataProvider = ({ children }) => {
   const [petsLoading, setPetsLoading] = useState(true);
   const [petsError, setPetsError] = useState("");
 
-  // Las citas siguen siendo simuladas.
-  const [appointments, setAppointments] = useLocalStorage(
-    "vp_appointments",
-    seedAppointments
-  );
+  // las citas ahora vienen del ms de citas
+  const [appointments, setAppointments] = useState([]);
+  const [appointmentsLoading, setAppointmentsLoading] = useState(true);
+  const [appointmentsError, setAppointmentsError] = useState("");
 
   const refreshPets = useCallback(async () => {
     setPetsLoading(true);
@@ -49,9 +44,29 @@ export const DataProvider = ({ children }) => {
     }
   }, []);
 
+  // carga las citas desde el ms de citas
+  const refreshAppointments = useCallback(async () => {
+    setAppointmentsLoading(true);
+    setAppointmentsError("");
+
+    try {
+      const data = await appointmentsService.getAll();
+      setAppointments(data);
+    } catch (error) {
+      console.error(error);
+      setAppointmentsError(
+        error.response?.data?.message ||
+        "No se pudo conectar con el backend de citas."
+      );
+    } finally {
+      setAppointmentsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     refreshPets();
-  }, [refreshPets]);
+    refreshAppointments();
+  }, [refreshPets, refreshAppointments]);
 
   const addPet = async (pet) => {
     const created = await petsService.create(pet);
@@ -70,25 +85,19 @@ export const DataProvider = ({ children }) => {
     await refreshPets();
   };
 
-  const addAppointment = (appointment) => {
-    setAppointments((prev) => [
-      ...prev,
-      {
-        ...appointment,
-        id: nextId(prev, 100),
-        status: "Pendiente",
-      },
-    ]);
+  // el back le pone el id y el status Pendiente
+  // si falla dejo que el error suba para mostrarlo en el componente
+  const addAppointment = async (appointment) => {
+    const created = await appointmentsService.create(appointment);
+    await refreshAppointments();
+    return created;
   };
 
-  const updateAppointmentStatus = (id, status) => {
-    setAppointments((prev) =>
-      prev.map((appointment) =>
-        appointment.id === id
-          ? { ...appointment, status }
-          : appointment
-      )
-    );
+  // el back responde 409 si la transicion de estado no es valida
+  const updateAppointmentStatus = async (id, status) => {
+    const updated = await appointmentsService.updateStatus(id, status);
+    await refreshAppointments();
+    return updated;
   };
 
   return (
@@ -103,6 +112,9 @@ export const DataProvider = ({ children }) => {
         updatePet,
         deletePet,
         appointments,
+        appointmentsLoading,
+        appointmentsError,
+        refreshAppointments,
         addAppointment,
         updateAppointmentStatus,
       }}
