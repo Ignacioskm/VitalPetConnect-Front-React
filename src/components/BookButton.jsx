@@ -59,13 +59,13 @@ export default function BookButton({
 
   // Datos del backend y funciones del contexto
   const {
-    pets,
-    species,
+    pets = [],
+    species = [],
     petsLoading,
     petsError,
     addPet,
     addAppointment,
-  } = useContext(DataContext);
+  } = useContext(DataContext) || {};
 
   // Estados del modal
   const [open, setOpen] = useState(false);
@@ -92,7 +92,7 @@ export default function BookButton({
     : [];
 
   // Especies recuperadas desde GET /api/pets/species
-  const speciesOptions = species.map((item) => ({
+  const speciesOptions = (species || []).map((item) => ({
     value: String(item.id),
     label:
       SPECIES_LABELS[item.name.toUpperCase()] ?? item.name,
