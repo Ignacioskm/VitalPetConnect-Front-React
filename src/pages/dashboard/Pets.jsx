@@ -1,6 +1,5 @@
 import { useContext, useState } from "react";
 import { DataContext } from "../../context/DataContext";
-import { seedUsers } from "../../data/mockData";
 import StatusBadge from "../../components/StatusBadge";
 
 const emptyForm = {
@@ -15,6 +14,9 @@ const emptyForm = {
 export default function Pets() {
   const {
     pets,
+    users,
+    usersLoading,
+    usersError,
     species,
     petsLoading,
     petsError,
@@ -27,10 +29,6 @@ export default function Pets() {
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const users = JSON.parse(
-    localStorage.getItem("vp_usersList") || "null"
-  ) ?? seedUsers;
-
   const getOwner = (ownerId) => {
     if (ownerId == null) return "Sin propietario";
 
@@ -38,9 +36,7 @@ export default function Pets() {
       (u) => Number(u.id) === Number(ownerId)
     );
 
-    return owner
-      ? `${owner.name} ${owner.lastName ?? ""}`.trim()
-      : `Usuario #${ownerId}`;
+    return owner ? owner.name : `Usuario #${ownerId}`;
   };
 
   const getSpecies = (speciesId) => {
@@ -79,6 +75,15 @@ export default function Pets() {
       return;
     }
 
+    if (usersError || usersLoading || users.length === 0) {
+      setError("No se puede registrar una mascota sin el listado real de propietarios.");
+      return;
+    }
+    if (!form.ownerId || !users.some((u) => Number(u.id) === Number(form.ownerId) && String(u.role).toUpperCase() === "CLIENT")) {
+      setError("Selecciona un propietario CLIENT válido.");
+      return;
+    }
+
     setSaving(true);
 
     try {
@@ -88,9 +93,7 @@ export default function Pets() {
         breed: form.breed.trim(),
         birthDate: form.birthDate,
         weight: Number(form.weight),
-        ownerId: form.ownerId
-          ? Number(form.ownerId)
-          : null,
+        ownerId: Number(form.ownerId),
       });
 
       setForm(emptyForm);
@@ -209,19 +212,22 @@ export default function Pets() {
               value={form.ownerId}
               onChange={handleChange}
             >
-              <option value="">Sin propietario</option>
+              <option value="">Selecciona un propietario</option>
               {users
-                .filter((u) => u.role === "cliente")
+                .filter((u) => String(u.role).toUpperCase() === "CLIENT")
                 .map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.name} {u.lastName} (ID: {u.id})
+                    {u.name} (ID: {u.id})
                   </option>
                 ))}
             </select>
 
+            {usersLoading && <p className="text-muted small">Cargando propietarios...</p>}
+            {usersError && <div className="alert alert-warning">{usersError}</div>}
+
             <button
               className="btn btn-primary w-100 mt-3"
-              disabled={saving}
+              disabled={saving || usersLoading || Boolean(usersError)}
             >
               {saving ? "Guardando..." : "Guardar mascota"}
             </button>

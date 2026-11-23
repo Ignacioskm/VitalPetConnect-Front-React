@@ -1,6 +1,6 @@
 import { useContext, useState } from "react";
 import { DataContext } from "../../context/DataContext";
-import { vets, seedUsers } from "../../data/mockData";
+import { vets, services } from "../../data/mockData";
 import StatusBadge from "../../components/StatusBadge";
 
 const formVacio = { petId: "", date: "", time: "", reason: "", vet: "" };
@@ -16,19 +16,17 @@ function obtenerFechaHoy() {
 // pagina de citas: formulario para agendar y tabla con filtro y botones
 // los datos y las funciones salen del DataContext
 export default function Appointments() {
-  const { appointments, addAppointment, updateAppointmentStatus, pets, appointmentsError } = useContext(DataContext);
+  const { appointments, addAppointment, updateAppointmentStatus, pets, appointmentsError, users, usersLoading, usersError } = useContext(DataContext);
 
-  // los usuarios siguen en localstorage, igual que en Pets.jsx
-  const usuarios = JSON.parse(localStorage.getItem("vp_usersList") || "null") ?? seedUsers;
-
-  // busca el dueno por id para mostrar el nombre en el select
+  // Usuarios reales del microservicio Users (solo ADMIN).
   function buscarDueno(ownerId) {
-    return usuarios.find((u) => Number(u.id) === Number(ownerId));
+    return users.find((u) => Number(u.id) === Number(ownerId));
   }
 
   function nombreDueno(ownerId) {
+    if (ownerId == null) return "Sin propietario";
     const u = buscarDueno(ownerId);
-    return u ? (u.name + " " + (u.lastName ?? "")).trim() : "Usuario #" + ownerId;
+    return u ? u.name : "Usuario #" + ownerId;
   }
 
   const [filtro, setFiltro] = useState("Todas");
@@ -70,6 +68,10 @@ export default function Appointments() {
       return;
     }
     const dueno = buscarDueno(mascota.ownerId);
+    if (!dueno?.email) {
+      setErrorApi("No se pudo encontrar el propietario real en Users. Comprueba el listado de usuarios.");
+      return;
+    }
 
     setErrorApi("");
 
@@ -80,7 +82,7 @@ export default function Appointments() {
         petName: mascota.name,
         ownerId: Number(mascota.ownerId),
         ownerName: nombreDueno(mascota.ownerId),
-        ownerEmail: dueno ? dueno.email : "",
+        ownerEmail: dueno.email,
         date: form.date,
         time: form.time,
         reason: form.reason.trim(),
@@ -114,11 +116,14 @@ export default function Appointments() {
           <form className="vp-caja" onSubmit={guardarCita}>
             <h5>Agendar cita</h5>
 
+            {usersLoading && <p className="text-muted small">Cargando propietarios...</p>}
+            {usersError && <div className="alert alert-warning">{usersError}</div>}
+
             <label className="form-label">Mascota</label>
             <select className="form-select" name="petId" value={form.petId} onChange={cambiarCampo}>
               <option value="">Selecciona</option>
               {pets.map((m) =>
-                m.active ? <option key={m.id} value={m.id}>{m.name} ({nombreDueno(m.ownerId)})</option> : null
+                m.active && buscarDueno(m.ownerId) ? <option key={m.id} value={m.id}>{m.name} ({nombreDueno(m.ownerId)})</option> : null
               )}
             </select>
             {errores.petId && <small className="vp-error">{errores.petId}</small>}
@@ -131,8 +136,22 @@ export default function Appointments() {
             <input className="form-control" type="time" name="time" value={form.time} onChange={cambiarCampo} />
             {errores.time && <small className="vp-error">{errores.time}</small>}
 
-            <label className="form-label mt-2">Motivo</label>
-            <input className="form-control" name="reason" value={form.reason} onChange={cambiarCampo} />
+            <label className="form-label mt-2" htmlFor="reason">Motivo de la consulta</label>
+            <select
+              id="reason"
+              className="form-select"
+              name="reason"
+              value={form.reason}
+              onChange={cambiarCampo}
+              required
+            >
+              <option value="">Selecciona un servicio...</option>
+              {services.map((servicio) => (
+                <option key={servicio.id} value={servicio.title}>
+                  {servicio.title} - ${servicio.price.toLocaleString("es-CL")}
+                </option>
+              ))}
+            </select>
             {errores.reason && <small className="vp-error">{errores.reason}</small>}
 
             <label className="form-label mt-2">Veterinario</label>
@@ -144,7 +163,7 @@ export default function Appointments() {
 
             {errorApi && <div className="alert alert-danger mt-3 mb-0">{errorApi}</div>}
 
-            <button type="submit" className="btn btn-primary w-100 mt-3">Agendar</button>
+            <button type="submit" className="btn btn-primary w-100 mt-3" disabled={usersLoading || Boolean(usersError)}>Agendar</button>
           </form>
         </div>
 
@@ -195,7 +214,7 @@ export default function Appointments() {
                     return (
                       <tr key={c.id}>
                         <td>{c.petName}</td>
-                        <td>{c.ownerName}</td>
+                        <td>{nombreDueno(c.ownerId)}</td>
                         <td>{c.date} {c.time}</td>
                         <td>{c.reason}</td>
                         <td>{c.vet}</td>

@@ -6,7 +6,8 @@ import StatusBadge from "../../components/StatusBadge";
 // los datos ya no llegan por props, los saco del DataContext
 export default function DashHome() {
   // del context saco las listas de mascotas y citas
-  const { pets, appointments } = useContext(DataContext);
+  const { pets, appointments, users } = useContext(DataContext);
+  const nombreDueno = (id) => users.find((u) => Number(u.id) === Number(id))?.name || `Usuario #${id}`;
 
   // estado del filtro de la tabla, parte mostrando todas
   const [filtro, setFiltro] = useState("Todas");
@@ -107,7 +108,7 @@ export default function DashHome() {
                 return (
                   <tr key={i}>
                     <td>{c.petName}</td>
-                    <td>{c.ownerName}</td>
+                    <td>{nombreDueno(c.ownerId)}</td>
                     <td>{c.date} {c.time}</td>
                     <td>{c.vet}</td>
                     <td><StatusBadge status={c.status} /></td>
