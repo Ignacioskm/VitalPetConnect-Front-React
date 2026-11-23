@@ -138,10 +138,13 @@ src/
 ## 🧪 Testing
 
 ```bash
-npm test
+npm test           # ejecuta la suite una vez (vitest run)
+npm run coverage   # ejecuta los tests y genera el reporte en coverage/index.html
 ```
 
-Los tests cubren los contextos (`AuthContext`, `DataContext`), el hook `useLocalStorage` y los componentes `BookButton`, `Navbar`, `Footer`, `FormField`, `MyProfileEdit`, `ProtectedRoute` y `StatusBadge`.
+Los tests cubren los contextos (`AuthContext`, `DataContext`), el hook `useLocalStorage`, los servicios/clients de API y los componentes `BookButton`, `Navbar`, `Footer`, `FormField`, `MyProfileEdit`, `ProtectedRoute` y `StatusBadge`.
+
+El reporte HTML mantiene la misma estructura de siempre (carpetas `api`, `components`, `context`, `data` y `hooks`, con selector de tema claro/oscuro). Vitest exige un mínimo de **80%** en statements, branches, functions y lines; cobertura actual: **96% statements / 88% branches / 96% functions / 97% lines**.
 
 ---
 

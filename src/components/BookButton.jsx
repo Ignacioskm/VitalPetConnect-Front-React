@@ -84,7 +84,7 @@ export default function BookButton({
   // Mascotas activas del usuario actual
   // Ahora se filtran por ownerId, no por ownerEmail
   const myPets = user
-    ? pets.filter(
+    ? (pets ?? []).filter(
         (pet) =>
           Number(pet.ownerId) === Number(user.id) &&
           pet.active
@@ -92,7 +92,7 @@ export default function BookButton({
     : [];
 
   // Especies recuperadas desde GET /api/pets/species
-  const speciesOptions = species.map((item) => ({
+  const speciesOptions = (species ?? []).map((item) => ({
     value: String(item.id),
     label:
       SPECIES_LABELS[item.name.toUpperCase()] ?? item.name,
@@ -503,7 +503,7 @@ export default function BookButton({
             <button
               type="submit"
               className="btn btn-success fw-bold py-2"
-              disabled={savingPet || species.length === 0}
+              disabled={savingPet || (species ?? []).length === 0}
             >
               {savingPet
                 ? 'Guardando mascota...'
