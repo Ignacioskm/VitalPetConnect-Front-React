@@ -7,7 +7,7 @@ import { usersService } from '../api/usersService';
 export const DataContext = createContext();
 
 export function DataProvider({ children }) {
-  const { user } = useContext(AuthContext);
+  const { user } = useContext(AuthContext) ?? {};
   const userId = user?.id;
   const role = user?.role;
   const generation = useRef(0);
